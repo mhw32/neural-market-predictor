@@ -55,7 +55,20 @@ for l=1:length(link_array)
     end
 end
 
+% Read from csv file
+csv_file = 'companylist.csv';
+disp(strcat('STEP 1 (from source:3). Downloading data from csvfile:', csv_file);
+csv_data = csvimport(csv_file);
+tmpticks = {csv_data{:, 1}};
+% make them readable
+for i=1:length(tmpticks)
+    tmpticks{i} = tmpticks{i}(2:end-1);
+end
+tmpticks=tmpticks';
+
+disp('Joining all ticker data. Creating ticker object.');
 tickers=tickers(1:2:end);
+tickers=[tickers; tmpticks];
 tickers=unique(tickers);
 tickers=tickers';
 

@@ -15,7 +15,7 @@ for l=1:length(link_array)
     page=0;
     tokens=1;
     prevtokens=1;
-    disp(strcat('STEP 1 (from source:', l, ').', 'Downloading historical trading data from: ', link_array{l}));
+    disp(strcat('STEP 1 (from source:', num2str(l), ').', 'Downloading historical trading data from: ', link_array{l}));
     while isempty(tokens)==0
         % Get current page url
         url_string = strcat(link_array{l},int2str(page));
@@ -54,6 +54,12 @@ for l=1:length(link_array)
         end
     end
 end
+
+% Read from csv file
+csv_file = 'companylist.csv';
+csv_array = {csv_file};
+
+for l=1:length(link_
 
 tickers=tickers(1:2:end);
 tickers=unique(tickers);
