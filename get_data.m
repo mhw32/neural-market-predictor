@@ -168,5 +168,4 @@ end
 
 % We end with two giant structures - hist_fund_data, and stocks.
 % hist_fund_data is composed of matrices itself consisting of features per
-% ticker. Stocks are just a bunch of history for that ticker's stocks.
-
+% ticker. 
