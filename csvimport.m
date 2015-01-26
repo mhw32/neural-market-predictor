@@ -256,8 +256,8 @@ for ii = 2 : nLines
       'that on the first line (%d). Data in this line will be padded.'], ii, nDataElems, nCols );
     rowData(nDataElems+1:nCols) = {''};
   elseif nDataElems > nCols
-    warning( 'csvimport:UnevenColumns', ['Number of data elements on line %d (%d) differs from ' ...
-      'that one the first line (%d). Data in this line will be truncated.'], ii, nDataElems, nCols );
+    %warning( 'csvimport:UnevenColumns', ['Number of data elements on line %d (%d) differs from ' ...
+    %  'that one the first line (%d). Data in this line will be truncated.'], ii, nDataElems, nCols );
     rowData     = rowData(1:nCols);
   end
   data(ii,:)    = rowData;

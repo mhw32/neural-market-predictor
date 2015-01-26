@@ -1,6 +1,7 @@
 % This script is used to scrape data from the london stock exchange for
 % FTSE Share components.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Download historical insider trading data
 % Take out bad noise
 tickers={};
@@ -55,16 +56,16 @@ for l=1:length(link_array)
     end
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Read from csv file
 csv_file = 'companylist.csv';
-disp(strcat('STEP 1 (from source:3). Downloading data from csvfile:', csv_file);
+disp(strcat('STEP 1 (from source:3). Downloading data from csvfile:', csv_file));
 csv_data = csvimport(csv_file);
-tmpticks = {csv_data{:, 1}};
+tmpticks = (csv_data(:, 1));
 % make them readable
 for i=1:length(tmpticks)
     tmpticks{i} = tmpticks{i}(2:end-1);
 end
-tmpticks=tmpticks';
 
 disp('Joining all ticker data. Creating ticker object.');
 tickers=tickers(1:2:end);
@@ -72,6 +73,7 @@ tickers=[tickers; tmpticks];
 tickers=unique(tickers);
 tickers=tickers';
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create two empty structs
 hist_fund_data=struct(); 
 stocks=struct();
@@ -171,6 +173,7 @@ for i=1:size(tickers, 2)
         disp('Size is correct; adding to the Hash');
         hist_fund_data.(fund_name)=fund_data;
 
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %Download historical fund data -- What is this?
         % 6 year total span
         % Track stocks here
