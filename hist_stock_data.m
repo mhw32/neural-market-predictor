@@ -98,7 +98,6 @@ idx = 1;                                    % idx for current stock data
 
 % cycle through each ticker symbol and retrieve historical data
 for i = 1:length(tickers)
-    
     % update waitbar to display current ticker
     waitbar((i-1)/length(tickers),h,sprintf('%s %s %s%0.2f%s', ...
         'Retrieving stock data for',tickers{i},'(',(i-1)*100/length(tickers),'%)'))
@@ -112,15 +111,17 @@ for i = 1:length(tickers)
         % organize data by using the comma delimiter
         [date, op, high, low, cl, volume, adj_close] = ...
             strread(temp(43:end),'%s%s%s%s%s%s%s','delimiter',',');
-
+       
+        % Select only Fridays and take out only closing price data
+        tmp = weekday(date) == 6;
         stocks(idx).Ticker = tickers{i};        % obtain ticker symbol
-        stocks(idx).Date = date;                % save date data
-        stocks(idx).Open = str2double(op);      % save opening price data
-        stocks(idx).High = str2double(high);    % save high price data
-        stocks(idx).Low = str2double(low);      % save low price data
-        stocks(idx).Close = str2double(cl);     % save closing price data
-        stocks(idx).Volume = str2double(volume);      % save volume data
-        stocks(idx).AdjClose = str2double(adj_close); % save adjustied close data
+        stocks(idx).Date = date(tmp);           % save date data
+        % stocks(idx).Open = str2double(op);      % save opening price data
+        % stocks(idx).High = str2double(high);    % save high price data
+        % stocks(idx).Low = str2double(low);      % save low price data
+        stocks(idx).Close = str2double(cl(tmp));     % save closing price data
+        % stocks(idx).Volume = str2double(volume);      % save volume data
+        stocks(idx).AdjClose = str2double(adj_close(tmp)); % save adjustied close date
         
         idx = idx + 1;                          % increment stock index
     end

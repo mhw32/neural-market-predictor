@@ -48,6 +48,7 @@ for i=1:size(buy_data, 1)
 end
 
 tickers=tickers(1:2:end);
+tickers=unique(tickers);
 tickers=tickers';
 
 % Create two empty structs
@@ -156,7 +157,7 @@ for i=1:1
     end_date   = get_quarter_dates(hist_fund_data.(fund_name){end,1});
     try
         disp(strcat('PART B: Continuing to grabbing stock data for: ', fund_name));
-        stocks.(fund_name) = hist_stock_data(start_date, end_date, fund_name);
+        stocks.(fund_name) = hist_stock_data(start_date, end_date, fund_name, 'frequency', 'w');
         disp('Finished pulling stock data.');
     catch
         continue
