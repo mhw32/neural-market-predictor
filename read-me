@@ -6,9 +6,9 @@ http://www.londonstockexchange.com/exchange/prices-and-markets/international-mar
 
 http://www.londonstockexchange.com/exchange/prices-and-markets/international-markets/indices/home.html
 
-And the downloaded CSV file (companylist.csv). 
+And the downloaded CSV files (companylist.csv, nyselist.csv). 
 
-In total, there are 3,350 tickers being used. These tickers exclusively come form NASDAQ and NYSE, seeing that these are the two available sources of information. 
+In total, there are 6,500 tickers being used. These tickers exclusively come form NASDAQ and NYSE, seeing that these are the two available sources of information. Also included are some FTSE data points which are from LSE.  
 
 For each ticker, it is grabbing fundamental data using the following site: http://uk.advfn.com/p.php?pid=financials&btn=istart_date&mode=quarterly_reports&symbol=____%3A____&istart_date=____.
 
@@ -22,6 +22,8 @@ Edits were made to hist_stock_data.m to ensure that only data from Friday closin
 Code is borrowed from the web (getTableFromWeb and csvimport).
 
 Further improvements are to be made by pulling more data from other international markets, to improve robustness and quality of the data kept it, and to save the data in an orderly fashion (db/json/pickle). 
+
+The mat2db.py file is a "work in progress/incomplete" to use python to load the saved mat files and put them in my local postgres db. Future work on the project will likely be in python. 
 
 Please feel free to email mike.wu@new.ox.ac.uk for further questions about usage. 
 

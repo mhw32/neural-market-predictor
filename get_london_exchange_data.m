@@ -57,19 +57,63 @@ for l=1:length(link_array)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Read data from the yahoo stuff.
+link_yahoo = 'https://uk.finance.yahoo.com/q/cp?s=%5EFTAS&c=';
+buy_data=[];
+page=0;
+tokens=1;
+disp(strcat('STEP 1 (from source:3). Downloading data from: ', link_yahoo));
+
+while isempty(tokens)==0
+    % Get current page url
+    url_string = strcat(link_yahoo,int2str(page));
+    % Read current page url
+    str = urlread(url_string);
+    % Regex to pull out the right classes 
+    expr = '((?<=(<t(d|r) class="yfnc_tabledata1">))(.*?)(?=(</td>)))|((?<=(<td>))(\d+\.\d+)(?=(</td>)))';
+    tokens = regexp(str,expr,'tokens');
+    tokens = tokens(1:2:end);
+    tokens = vertcat(tokens{:});
+    
+    % Replace all the html formatting with spaces
+    pat = '(<[^>]*>)|(&nbsp)';
+    for i=1:size(tokens, 1)
+        tmp=regexprep(tokens(i, :), pat, '');
+        tokens(i) = cellstr(tmp{:}(1:end-2));
+    end
+    
+    buy_data=[buy_data; tokens];
+    page=page+1; % end page
+    disp(strcat('Grabbing data from page:',num2str(page))); 
+end
+
+tickers=[tickers; buy_data];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Read from csv file
 csv_file = 'companylist.csv';
-disp(strcat('STEP 1 (from source:3). Downloading data from csvfile:', csv_file));
+disp(strcat('STEP 1 (from source:4). Downloading data from csvfile:', csv_file));
 csv_data = csvimport(csv_file);
 tmpticks = (csv_data(:, 1));
 % make them readable
 for i=1:length(tmpticks)
     tmpticks{i} = tmpticks{i}(2:end-1);
 end
-
+% Adding tickers
 disp('Joining all ticker data. Creating ticker object.');
 tickers=tickers(1:2:end);
 tickers=[tickers; tmpticks];
+
+% Read from other csv file
+nyse_file = 'nyselist.csv';
+disp(strcat('STEP 1 (from source:5). Downloading data from csvfile:', nyse_file));
+nyse_data = csvimport(nyse_file);
+nyse_tickers = nyse_data(2:end);
+% Adding tickers
+tickers=[tickers; nyse_tickers];
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 tickers=unique(tickers);
 tickers=tickers';
 
