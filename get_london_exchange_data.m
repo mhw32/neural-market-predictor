@@ -2,7 +2,7 @@
 % FTSE Share components.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Download historical insider trading data
+% Download historical insider trading data
 % Take out bad noise
 tickers={};
 

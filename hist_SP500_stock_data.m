@@ -1,11 +1,11 @@
 % This script is intended to be used to extract S&P500 Prices. 
 % to be an indicator of the general market movements.
 
-function market_stocks = hist_market_stock_data(start_date, end_date, freq)
+function market_stocks = hist_SP500_stock_data(start_date, end_date, freq)
     
     % Default to week if not given
     if nargin == 2
-        freq = 'w';
+        freq = 'd';
     end
     
     % Select the ticker ^GSPC.
@@ -26,7 +26,8 @@ function market_stocks = hist_market_stock_data(start_date, end_date, freq)
     link_market = strcat('http://real-chart.finance.yahoo.com/table.csv?s=%5E'...
             ,fund_name,'&a=',bm,'&b=',bd,'&c=',by,'&d=',em,'&e=',ed,'&f=',...
             ey,'&g=',freq,'&ignore=.csv');
-
+    disp(link_market);
+        
     % Read the URL
     [data, status] = urlread(link_market);
 
@@ -34,7 +35,6 @@ function market_stocks = hist_market_stock_data(start_date, end_date, freq)
         % Organize the data using the comma delimiter
         [date, op, high, low, cl, volume, adj_close] = ...
             strread(data(43:end),'%s%s%s%s%s%s%s','delimiter',',');
-
         % We should only do Fridays to be consistent!
         dayofweek = weekday(date) == 6;
         market_stocks(1).Ticker = fund_name; % Ticker Symbol
