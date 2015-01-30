@@ -131,8 +131,8 @@ disp('STEP 2. Start grabbing data for each ticker.');
 
 % This will store that information in the hist hash
 for i=1:size(tickers, 2)
-    % Convert to string
-    fund_name=char(tickers(i));
+    % Convert to string -- delete white space
+    fund_name=strtrim(char(tickers(i)));
     disp(strcat('Scrape for ticker:', fund_name));
     % Initialize empty variables
     page=0;

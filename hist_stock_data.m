@@ -103,9 +103,11 @@ for i = 1:length(tickers)
         'Retrieving stock data for',tickers{i},'(',(i-1)*100/length(tickers),'%)'))
         
     % download historical data using the Yahoo! Finance website
-    [temp, status] = urlread(strcat('http://ichart.finance.yahoo.com/table.csv?s='...
+    tmpurl = strcat('http://ichart.finance.yahoo.com/table.csv?s='...
         ,tickers{i},'&a=',bm,'&b=',bd,'&c=',by,'&d=',em,'&e=',ed,'&f=',...
-        ey,'&g=',freq,'&ignore=.csv'));
+        ey,'&g=',freq,'&ignore=.csv');
+    disp(tmpurl);
+    [temp, status] = urlread(tmpurl);
     
     if status
         % organize data by using the comma delimiter
@@ -119,7 +121,7 @@ for i = 1:length(tickers)
         % stocks(idx).Open = str2double(op);      % save opening price data
         % stocks(idx).High = str2double(high);    % save high price data
         % stocks(idx).Low = str2double(low);      % save low price data
-        stocks(idx).Close = str2double(cl(tmp));     % save closing price data
+        % stocks(idx).Close = str2double(cl(tmp));     % save closing price data
         % stocks(idx).Volume = str2double(volume);      % save volume data
         stocks(idx).AdjClose = str2double(adj_close(tmp)); % save adjustied close date
         
