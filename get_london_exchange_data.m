@@ -220,9 +220,9 @@ for i=1:size(tickers, 2)
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         %Download historical fund data -- What is this?
         % 6 year total span
-        % Track stocks here
-        start_date = get_quarter_dates(hist_fund_data.(fund_name){2,1});
-        end_date   = get_quarter_dates(hist_fund_data.(fund_name){end,1});
+        % Track stocks here -- these dates are chosen based on the data
+        % that is available from GSPC. Match them. 
+        start_date = '03011950'; end_date = '30012015';
         try
             disp(strcat('PART B: Continuing to grabbing stock data for: ', fund_name));
             stocks.(fund_name) = hist_stock_data(start_date, end_date, fund_name);

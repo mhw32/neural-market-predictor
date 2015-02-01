@@ -41,4 +41,15 @@ New Files:
 7)  wu-example-feature-data.mat := Ran a trial (~2000 stocks). Successfully
 	saved the vectors. 
 
+Problems Encountered:
+
+1) Some of the Stock data returns empty array. I treat all features using 
+these to be NaN.
+
+2) Some of the Stock data returns data that is not completely weekly. It 
+often skips weeks. In this case -- I should be filling in the middle cases
+with NaN, but instead I just treated the entire thing as NaN. This is a 
+rare error; ~15/2000
+
 Cheers
+

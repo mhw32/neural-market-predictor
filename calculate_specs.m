@@ -236,6 +236,18 @@ function val=get_stock_adj_close_price(s)
     if isempty(s); val = NaN; else val = s.AdjClose; end;
 end
 
-function val=get_log_revenue_return(r)
-    val = r.AdjClose;
+function val=get_log_revenue_return(m, s)
+    if isempty(s)
+        val = NaN;
+    elseif length(s.AdjClose) <= 2
+        val = NaN;
+    else
+        r = relative_returns(m, s);
+        % hacky soln rite here
+        if isa(r, 'double') && isnan(r)
+            val = NaN;
+        else
+            val = r.Price;
+        end
+    end
 end
