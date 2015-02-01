@@ -233,9 +233,9 @@ end
 
 % Get stock price features
 function val=get_stock_adj_close_price(s)
-    val = s;
+    if isempty(s); val = NaN; else val = s.AdjClose; end;
 end
 
 function val=get_log_revenue_return(r)
-    val = r;
+    val = r.AdjClose;
 end
