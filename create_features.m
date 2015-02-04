@@ -28,8 +28,8 @@ function features_data = create_features(hist_fund_data, stock_data, market_data
        all_existing_features_tag = existing_features_tag;
        all_existing_features_data = existing_features_data;
        all_keys = all_existing_features_tag';
-       all_values = [];
-       for i=1:length(all_existing_features_data)
+       all_values = [{all_existing_features_data(:, 1)}];
+       for i=2:length(all_existing_features_data)
            % Converting to a double makes all the empty slots --> NaN perfect!
            all_values = [all_values cellfun(@(x)str2double(x), {all_existing_features_data(:, i, 1)}, 'UniformOutput', false)];
        end
@@ -86,7 +86,7 @@ function features_data = create_features(hist_fund_data, stock_data, market_data
            'Interest Coverage', 'Fixed Asset Turnover', 'Total Asset Turnover', ...
            'Cash Ratio', 'Net Asset Value ', 'Earnings Per Share', 'EBITDA Per Share', ...
            'Dividend Per Share', 'Total Assets / NAV', 'Stock Adjusted Closing Price', ...
-           'Log Revenue Return'}; 
+           'Log Revenue Return', 'Date'}; 
 
        % Find all the functions 
        fs = calculate_specs;
@@ -104,7 +104,8 @@ function features_data = create_features(hist_fund_data, stock_data, market_data
            fs.get_interest_coverage(all_f), fs.get_fix_asset_turnover(all_f), fs.get_tot_asset_turnover(all_f), ...
            fs.get_cash_ratio(all_f), fs.get_asset_value(all_f), fs.get_earnings_per_share(all_f), ...
            fs.get_ebitda_per_share(all_f), fs.get_divid_per_share(all_f), fs.get_tot_assets_over_nav(all_f), ...
-           fs.get_stock_adj_close_price(stock_data.(dummy_var)), fs.get_log_revenue_return(market_data, stock_data.(dummy_var))}; 
+           fs.get_stock_adj_close_price(stock_data.(dummy_var), all_f), fs.get_log_revenue_return(market_data, stock_data.(dummy_var), all_f), ...
+           fs.get_date(all_f)}; 
 
        % Let's do part 2 of the features
        part2_features = containers.Map(new_features_tags, new_features_data);

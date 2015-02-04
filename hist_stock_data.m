@@ -93,14 +93,14 @@ else                                        % If text file supplied
     tickers = textread(varargin{1},'%s');   % obtain ticker symbols
 end
 
-h = waitbar(0, 'Please Wait...');           % create waitbar
+% h = waitbar(0, 'Please Wait...');           % create waitbar
 idx = 1;                                    % idx for current stock data
 
 % cycle through each ticker symbol and retrieve historical data
 for i = 1:length(tickers)
     % update waitbar to display current ticker
-    waitbar((i-1)/length(tickers),h,sprintf('%s %s %s%0.2f%s', ...
-        'Retrieving stock data for',tickers{i},'(',(i-1)*100/length(tickers),'%)'))
+    % waitbar((i-1)/length(tickers),h,sprintf('%s %s %s%0.2f%s', ...
+        % 'Retrieving stock data for',tickers{i},'(',(i-1)*100/length(tickers),'%)'))
         
     % download historical data using the Yahoo! Finance website
     tmpurl = strcat('http://ichart.finance.yahoo.com/table.csv?s='...
@@ -132,6 +132,6 @@ for i = 1:length(tickers)
     clear date op high low cl volume adj_close temp status
     
     % update waitbar
-    waitbar(i/length(tickers),h)
+    % waitbar(i/length(tickers),h)
 end
-close(h)    % close waitbar
+% close(h)    % close waitbar

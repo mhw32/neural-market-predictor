@@ -143,7 +143,7 @@ for i=1:size(tickers, 2)
     passer_var=0; % Indicates if we were in the loop or not
     not_enough_data=0; % Indicates if there is enough data based on first date
 
-    while size(out_table, 2)>2 && page<5 % While we are less than 200 pages
+    while size(out_table, 2)>2 && page<1 % While we are less than 9 years
         for j=1:size(exchanges, 2) % For each exchange 
             try
                 exchange_name=char(exchanges(1, j)); % Convert name to char
@@ -158,7 +158,6 @@ for i=1:size(tickers, 2)
                 if page == 0
                     earliest_date = out_table{2,2};
                     if (ensure_nine_years(earliest_date) == false)
-                        disp(strcat('Quitting due to < 9 years of data record.'));
                         not_enough_data = 1;
                     else 
                         disp(strcat('Continuing due to sufficient years of data record.'));
@@ -173,11 +172,17 @@ for i=1:size(tickers, 2)
         end
 
         if passer_var==0
+            disp('-----------------------------------------------------------------------------');
+            disp(strcat('Unable to find stock:', fund_name, ' in either the NYSE or NASDAQ exchanges'));
+            disp('-----------------------------------------------------------------------------');
             break;
         end
         
         if not_enough_data==1
             passer_var=0;
+            disp('-----------------------------------------------------------------------------');
+            disp(strcat('Quitting due to < 9 years of data record.'));
+            disp('-----------------------------------------------------------------------------');
             break
         end
 

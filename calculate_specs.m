@@ -48,6 +48,7 @@ function funcs = calculate_specs
     % Get stock price features
     funcs.get_stock_adj_close_price            = @get_stock_adj_close_price;
     funcs.get_log_revenue_return               = @get_log_revenue_return;
+    funcs.get_date                             = @get_date;
 end
 
 function val=get_shares_outstanding(f)
@@ -232,11 +233,32 @@ end
 %}
 
 % Get stock price features
-function val=get_stock_adj_close_price(s)
-    if isempty(s); val = NaN; else val = s.AdjClose; end;
+function val=get_stock_adj_close_price(s, dates)
+    dates = get_date(dates);
+    if isempty(s)
+        val = NaN;
+    else
+        filterP = {};
+        full_stock_dates = datetime(s.Date);
+        full_stock_prices = s.AdjClose;
+
+        start_dates = datetime(dates{1});
+        end_dates   = datetime(dates{2});
+        for i=1:length(start_dates)
+            curr_start = start_dates(i);
+            curr_end   = end_dates(i);
+
+            selection = full_stock_dates(full_stock_dates > curr_start);
+            Pselect = full_stock_prices(full_stock_dates > curr_start);
+            Pselect = Pselect(selection < curr_end);
+            filterP = [filterP; {Pselect}];
+        end
+        val = filterP;
+    end
 end
 
-function val=get_log_revenue_return(m, s)
+function val=get_log_revenue_return(m, s, dates)
+    dates = get_date(dates);
     if isempty(s)
         val = NaN;
     elseif length(s.AdjClose) <= 2
@@ -247,7 +269,35 @@ function val=get_log_revenue_return(m, s)
         if isa(r, 'double') && isnan(r)
             val = NaN;
         else
-            val = r.Price;
+            filterP = {};
+            full_stock_dates = datetime(r.Date);
+            full_stock_prices = r.Price;
+
+            start_dates = datetime(dates{1});
+            end_dates   = datetime(dates{2});
+            for i=1:length(start_dates)
+                curr_start = start_dates(i);
+                curr_end   = end_dates(i);
+
+                selection = full_stock_dates(full_stock_dates > curr_start);
+                Pselect = full_stock_prices(full_stock_dates > curr_start);
+                Pselect = Pselect(selection < curr_end);
+                filterP = [filterP; {Pselect}];
+            end
+            val = filterP;
         end
     end
+end
+
+function val=get_date(f)
+    fake_dates = f('INDICATORS');
+    start_date = [];
+    end_date   = [];
+    for i=1:length(fake_dates)
+        quarter = fake_dates(i);
+        [s, e] = wu_get_quarter_dates(quarter{:});
+        start_date = [start_date; s];
+        end_date   = [end_date; e];
+    end
+    val = {start_date end_date};
 end
