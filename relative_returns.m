@@ -41,7 +41,7 @@ function returns = relative_returns(market_stock_prices, indiv_stock_prices)
             % oops.. this is a big error! They should be the same size
             % I don't know why this is happening, so for now let's just
             % ignore it 
-            disp('!!!!!!!!!!!!! FATALITY: Bug in scrapping stock data -- incomplete');
+            disp('!!!!!!!!!!!!! FATALITY: Bug in scrapping stock data -- incomplete dates');
             returns = NaN;
             return 
         end
@@ -57,8 +57,4 @@ function returns = relative_returns(market_stock_prices, indiv_stock_prices)
     % Create outer hash.
     returns = calculations;
 end
-
-
-
-
 

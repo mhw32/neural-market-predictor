@@ -143,7 +143,7 @@ for i=1:size(tickers, 2)
     passer_var=0; % Indicates if we were in the loop or not
     not_enough_data=0; % Indicates if there is enough data based on first date
 
-    while size(out_table, 2)>2 && page<1 % While we are less than 9 years
+    while size(out_table, 2)>2 && page<40 % While we are less than 9 years
         for j=1:size(exchanges, 2) % For each exchange 
             try
                 exchange_name=char(exchanges(1, j)); % Convert name to char
@@ -155,6 +155,7 @@ for i=1:size(tickers, 2)
                     error('Improper Exchange Channel');
                 end
                 
+                % Ensure that there is enough data >9 years
                 if page == 0
                     earliest_date = out_table{2,2};
                     if (ensure_nine_years(earliest_date) == false)
@@ -195,6 +196,7 @@ for i=1:size(tickers, 2)
         disp(strcat(fund_name, ': page', num2str(page)));
     end
 
+    disp(passer_var);
     % Still in the loop for each ticker
     if passer_var==1 % If we managed to get data from uk website
         % Set the first column as the variable list
