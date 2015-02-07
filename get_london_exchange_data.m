@@ -116,6 +116,9 @@ tickers=[tickers; nyse_tickers];
 
 tickers=unique(tickers);
 tickers=tickers';
+% Hack to finish the half-done scrape
+idx = find(ismember(tickers, 'MCD'));
+tickers = tickers(idx:end);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Create two empty structs
@@ -152,6 +155,7 @@ for i=1:size(tickers, 2)
                 % Somehow picks out all the data! What is nr_table used for? 
                 out_table  = getTableFromWeb_mod(url_string, nr_table);
                 if size(out_table, 1) == 3 % Hack against improper Exchange testing returns
+                    passer_var = 0;
                     error('Improper Exchange Channel');
                 end
                 

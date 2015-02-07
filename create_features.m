@@ -1,8 +1,9 @@
-function [full_indexes, full_features] = create_features(hist_fund_data, stock_data, market_data)   
+function [full_indexes, full_features, descriptive_indexes, descriptive_features] = create_features(hist_fund_data, stock_data, market_data)   
    disp('BEGIN FEATURES FUNCTION: Reformatting data into hashed feature vector for learning');
    %%%%%%%%%% LET'S DEFINE A GLOBAL STRUCTURE %%%%%%%%%% 
    full_indexes  = [];
    full_features = [];
+   descriptive_features = [];
    tickers = fieldnames(hist_fund_data);
    
    % Loop through all the tickers
@@ -109,12 +110,15 @@ function [full_indexes, full_features] = create_features(hist_fund_data, stock_d
        merged_value = [part_one_value part_two_value];
        
        % Add three descriptive measures: ticker, start-date, end-date
-       %descriptive_tags = {'Ticker', 'Start Date', 'End Date'};
-       %merged_keys = [descriptive_tags merged_keys];
-       %tmp = fs.get_date(alldates);
-       %dummy_value = val2vec(dummy_var, size(merged_value, 1));
-       %merged_value = [dummy_value tmp{1} tmp{2} merged_value];
-       %disp(merged_value);
+       tmp = fs.get_date(alldates);
+       tmps = tmp{1}; tmpe = tmp{2}; % Split into start/end dates
+       starts = []; ends = [];
+       for i=1:size(tmps, 1)
+           starts = [starts; {tmps(i, :)}];
+           ends   = [ends; {tmpe(i, :)}];
+       end
+       dummy_value = val2vec(dummy_var, size(merged_value, 1));
+       merged_descriptions = [dummy_value starts ends];
        
        % Start the information for stock + returns
        stock_feature_tags = {'Stock Adjusted Closing Price','Log Revenue Return'}; 
@@ -126,30 +130,38 @@ function [full_indexes, full_features] = create_features(hist_fund_data, stock_d
        % For each row in merged_value, we know that there are a group of
        % stocks. Duplicate each row for each stock val.
        merged_keys = [merged_keys stock_feature_tags];
-       tmp = [];
+       tmp = []; % Store the duplicated data points
+       tmpD = []; % Store the duplicated description points
        for i=1:size(merged_value, 1)
            if size(price_data{i}, 1) > 0 && size(return_data{i}, 1) > 0
                for j=1:size(price_data{i}, 1)
                    tmp = [tmp; merged_value(i, :) price_data{i}(j) return_data{i}(j)];
+                   tmpD = [tmpD; merged_descriptions(i, :)];
                end
            else
+               % These NaN's exist if there isn't any data... at all for
+               % prices for this stock. IE we can't calc returns.
                tmp = [tmp; merged_value(i, :) NaN NaN]; 
+               tmpD = [tmpD; merged_descriptions(i, :)];
            end
        end
        merged_value = tmp;
+       merged_descriptions = tmpD;
        
        if k == 1
            full_indexes = merged_keys;
+           descriptive_indexes = {'Ticker', 'Start Date', 'End Date'};
        end
        % Fill out the full_features structure
        full_features = [full_features; merged_value];
+       descriptive_features = [descriptive_features; merged_descriptions];
    end
    % Compile it to the outer hash
    disp('END FEATURES FUNCTION: successful termination'); 
 end
 
 function tmp=val2vec(value, number)
-    tmp = [];
+    tmp = {};
     for i=1:number
         tmp = [tmp; value];
     end
