@@ -1,0 +1,36 @@
+READ-ME FOR WEEK THREE
+
+Goals:
+1) Fully scrape ~40 quarters worth of data
+2) Format the data into a feature matrix
+3) Full transition to Python 
+4) Specify time horizons by CUSUM
+5) Get code down for normality test and t-test
+6) Label. 
+
+New Files:
+
+1) storage folder: holds all the data files (.mat and .pkl). I think I'm just going to keep all the data in .mat because once moved to python, it is loaded extremely fast. If speed really becomes an issue, I will move to CSV.
+
+2) create_features.m, calculate_specs.m, relative_returns.m: reworkings of these three files to format data into feature matrix form instead of the previous hash format. 
+
+3) get_london_exchange_data.m: successfully grabbed all the data I wanted for now -- fixed bug. 
+
+4) python folder: Includes all the code for actual processing. Note, this folder contains two kinds of files: *.ipynb and *.py -- ipynb are ipython notebooks, I do most of the development in those i.e. visualization of data and method creation. When polished enough, I put the functions into a corresponding python file. 
+
+To run an ipython notebook, simply type "ipython notebook", and a web server will start in your browser. However, this requires several dependencies -- see "http://ipython.org/ipython-doc/2/install/install.html"
+
+	a) CUSUM-dev.ipynb: Adapting a version of CUSUM algorithm and playing with parameters and applying to financial set of data.
+
+	b) normality-test.ipynb: Check if a given set of data is normal by the skew test and the kurtosis test. I use a more strict threshold of 0.055 (instead of 0.05).
+
+	c) project-dev.ipynb: Formats the matlab data from .mat into pythonic variables. Uses numpy. 
+
+	d) detect-cusum.py: CUSUM algorithm found online -- contains some adaptations added by me.
+
+	e) Rest of python files: polished versions of the notebooks.
+
+
+
+
+

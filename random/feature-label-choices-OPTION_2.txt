@@ -1,0 +1,23 @@
+After reading the CUSUM paper, I am also considering a setup revolving around that and ARL. This would be very educational to me to get me familiar with a new system instead of looking at the same one I usually use (SVM). 
+
+Of course, this isn’t really going to be having anything to do with value investing because by the nature of detecting “abrupt changes”, CUSUM focuses more on instantaneous shifts in data. 
+
+For this, the kind of feature selection techniques doesn’t really change from before — still a focus on Stepwise Regression and PCA. 
+
+For labelling, I think now it might be useful to have multiple labels! 
+I propose the following four classes:
+
+1) Really good stock (high likelihood of increasing in price — probably should buy)
+2) Border good stock (middle likelihood of increasing in price - do some action) 
+3) Border bad stock (middle likelihood of decreasing in price - do some action)
+4) Really bad stock (high likelihood of decreasing in price — probably should sell)
+
+I think this would be a good set of labels because then I can know when to sell and buy based on the my labelling algorithm. These labels are just my own prejudice on how to work with “hot stocks” — buy when it starts jumping up high, sell when it starts falling. 
+(Funny thing is this is exactly what value investing tells me will lose me money — guess I can’t really believe them until I find out for myself right?)
+
+For the labelling algorithm, I’m going to use CUSUM with probably ARL. There will most likely be a second layer of learning to choose the ARL — as in a feedback loop: try increasing (or decreasing) ARL until total marginal profit is falling, and then go back down — that way oscillate between them until I find a really good one. I have a feeling a short ARL won’t be very accurate but necessary for such quick decisions for stock selling. 
+
+What I think I’m going to do is a CUSUM for each of my features, and see if any of them create abrupt changes that follow abrupt changes in return/price. More interesting if any of them consecutively spike BEFORE spikes in return/price (may be a direct/inverse relationship). To do that… maybe I’ll use just linear regression — something simple. 
+
+
+

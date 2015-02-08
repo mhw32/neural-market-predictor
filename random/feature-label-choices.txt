@@ -1,0 +1,55 @@
+This text file is for describing my process for making choices for the following topics:
+1) How do I plan on pruning features?
+2) How am I planning on labelling the data?
+3) How many labels do I plan on having?
+
+Feature Pruning
+———————————————
+
+This is important especially for me — because I actually included all of the features (~130). I should first remove redundancies. I knew that while making the feature vector; I just wanted to ensure that everything is available. For example, I am going to be using only normalized ratios + there are redundancies between the features in the pdf and those scrapped on the webpage. Also there are different types of ratios (with different section): I will pick a couple from each section instead of every one.
+
+Also because I am personally interested in making this be about value investing, I want to select those features that the book recommended, some of which are included here. I will personally be biased towards those features. Instead I will need to somehow figure out how to label stocks as good / bad investments… OR I can use a non-supervised clustering algorithm. Also something interesting I read about is the F-score summarizes a companies fundamental data. 
+
+How do we get rid of redundant / irrelevant features?
+We can either create features out of our existing features, or we can just prune out of our own features. 
+
+I prefer the second one more because it leaves us with a notion of what features specifically are contributing to the variance. Hopefully we can rank features such that we find at some point, the features are no longer explaining a significant enough proportion of the data’s variance. Our goal then should be to find the most significant features ranked by the amount of variance it explains.
+
+We should use a wrapper method, like stepwise regression. (One could also use filters and embedded methods but I think those are just too complex (and sometimes just work for specific models like the LASSO regularizer for linear regression). 
+
+Stepwise Regression = add the best feature each round, and stop when a certain amount of the variance is explained, or… we can stop when the slope of the marginal increase of variance explained is below some threshold. Cross-validation would be used to test this. This might be more expensive when (filter / embedded methods) but it’s intuitive. 
+
+We can try to create linear combinations of our features. My favorite here are PCA, and SVD. I also found something called LDA that might be worth considering. PCA (principal component analysis) = get principal components = rank linearly uncorrelated variables. I like this because I know what it is doing since I have used it before.
+
+LDA = Linear discriminant analysis. This finds a linear combination of separate to classes of objects. The advantage of this over PCA is that it takes into account the difference between classes of data (pays attention to class labels, which might be really cool!).
+
+SVD = Cleaner than PCA math-wise because we don’t have to worry about X*X_T. 
+
+And then a third option that I read about that might be interesting is the Minimum Redundancy Maximum Relevance Algorithm. This penalizes a feature’s relevancy to other selected features. I like this a lot because it takes into account correlation to other features. It picks mutually different features but maintain a high correlation to data.
+
+In short for this: I’m going to definitely try both the stepwise and PCA, because I’m not sure which method is actually better.. If neither is satisfactory, I’m also going try mRMR.
+
+Labelling Number
+————————————————
+
+I think I’m just going to have 2 classes = 1, 0. 1 is if the stock has projected returns in some top percentage of all firms (it is a firm that is below intrinsic value that looks like it will return soon). And 0 is if not (this should include stocks that are above, around intrinsic value AND value traps). Basically 1 is if I should invest. I’m rather risk averse, esp. seeing that this is an attempt at value investment, so it’s necessary that our model chooses 1 only if it’s a great fit. Ideally these stocks will be those that are below their intrinsic value and express good fundamental features that show a possibility for improved future returns. This also fits well if a classification model that splits out yes/no. Log relative return will probably be the thing that I use to evaluate a company.
+
+How to Label Data
+—————————————————
+
+I think I’m going to use the F-score as the main features. We will see with the feature trimming but I’m going to start with that. Try PCA as well to see how much variance it can explain — don’t use if low. 
+
+We will probably end up with around ~10 features: F-score and a couple other indicators. Standard deviation is a measure of how risky our investment is. 
+
+For the model, I’m going to pick between SVM and logistic regression. I’ll have to play with all of them, but I’m going to try SVM first just because I am comfortable with that technique.
+
+The question is how to a initially give it a training set? I need to label that somehow. 
+Also it’s important to remember that we need data before the firm starts doing well. Because it’s then when we know we need to invest. So we need to train on data some time (i.e. a year) before the firm becomes a top relative return firm. 
+
+Summary
+———————
+
+I may or may not use feature reduction. I might just pick the features that are used in value investing. I’ll consider PCA. Then I will use logistic regression or SVM to classify data into 1 or 0, where 1 is a good stock to invest in. We can train with stocks that are in the top % of relative returns. Ideally, if what we’ve read is true, then these stocks should express value investing traits. 
+
+On a side note, I’m really curious what CUSUM is capable of. I might change my mind and not use value investing, and focus on CUSUM to predict when stocks are going to jump up in price. (“hot stocks investment” — exactly what they told me not to do…)
+

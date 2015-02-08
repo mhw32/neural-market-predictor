@@ -1,0 +1,55 @@
+READ-ME FOR WEEK TWO
+--------------------
+
+Each week I will aim to provide a summary of the additional items added,
+and the goal accomplished.
+
+Goals: 
+1) Manipulate the data into feature vectors
+2) Grab the S&P500 data from online
+3) Take care of some NaN and bad data cleaning
+
+New Files:
+
+1)  calculate_specs.m := this is a pretty messy function that stores all the
+	features that we need to some calculation to get, stores them in a 
+	nested function and provides sub-functions to calculate each one. 
+
+2)  create_features.m := this is the actual function written to organize the 
+ 	raw data from hist_fund_data, stock_data, and market_data (GSPC) into 
+ 	feature vectors. A "feature vector" is actually a struct that contains 
+ 	N (~6500) hashes. Each hash contains keys of ~130 features that map to 
+ 	appropriate values. This also cleans up any stocks without ratio 
+ 	information, and any stocks with empty stock information.
+
+3)  loadData.m := this is just a tool for me to easily load the data I'm
+ 	using. TBH I'm kind of giving up on storing the data in a database...
+ 	matlab has a confusing interaction with JDBC and to funnel it into
+ 	postgres through python seems like overkill when you can just store 
+ 	it in a .mat file.
+
+4)  hist_SP500_stock_data.m := this file is the scrapper for SP500 data 
+	from yahoo finance. It is very based on hist_stock_data; the only changes
+	made were to fit the specific html file for GSPC.
+
+5)  sqljdbc...tar.gz := you can ignore this -- just something I'm playing 
+	around with.
+
+6)  relative_returns.m := This is what takes the GSPC and the stock price
+	data and calculates log relative return. 
+
+7)  wu-example-feature-data.mat := Ran a trial (~2000 stocks). Successfully
+	saved the vectors. 
+
+Problems Encountered:
+
+1) Some of the Stock data returns empty array. I treat all features using 
+these to be NaN.
+
+2) Some of the Stock data returns data that is not completely weekly. It 
+often skips weeks. In this case -- I should be filling in the middle cases
+with NaN, but instead I just treated the entire thing as NaN. This is a 
+rare error; ~15/2000
+
+Cheers
+
