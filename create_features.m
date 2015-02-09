@@ -13,6 +13,12 @@ function [full_indexes, full_features, descriptive_indexes, descriptive_features
        dummy_var = tickers{k};
        disp(strcat('Ticker #', num2str(k), ': Beginning calculations for-', dummy_var));
 
+       % Let's check that there are stock data, other wise, this is a waste
+       if size(stock_data.(dummy_var),1)==0 && size(stock_data.(dummy_var),2)==0
+           disp(strcat('ERROR: Unable to find any stock data. Skipping stock:', dummy_var));
+           continue;
+       end
+       
        % Let's make use of all the ratios existing from the scrape
        existing_features_tag  = hist_fund_data.(dummy_var)(1, :)';
        existing_features_data = hist_fund_data.(dummy_var)(2:end, :); 
@@ -119,30 +125,33 @@ function [full_indexes, full_features, descriptive_indexes, descriptive_features
        end
        dummy_value = val2vec(dummy_var, size(merged_value, 1));
        merged_descriptions = [dummy_value starts ends];
-       
+    
        % Start the information for stock + returns
-       stock_feature_tags = {'Stock Adjusted Closing Price','Log Revenue Return'}; 
-       price_data = fs.get_stock_adj_close_price(stock_data.(dummy_var), alldates);
-       return_data = fs.get_log_revenue_return(market_data, stock_data.(dummy_var), alldates);
-       % Function to ensure price and returns are the same size
-       [price_data, return_data] = fs.do_size_check(price_data, return_data);
+       stock_feature_tags = {'Log Stock Return', 'Log Index Return'}; 
+       log_stock_price = stock_log_return(stock_data.(dummy_var));
+       log_index_price = stock_log_return(market_data);
        
        % For each row in merged_value, we know that there are a group of
        % stocks. Duplicate each row for each stock val.
        merged_keys = [merged_keys stock_feature_tags];
        tmp = []; % Store the duplicated data points
        tmpD = []; % Store the duplicated description points
-       for i=1:size(merged_value, 1)
-           if size(price_data{i}, 1) > 0 && size(return_data{i}, 1) > 0
-               for j=1:size(price_data{i}, 1)
-                   tmp = [tmp; merged_value(i, :) price_data{i}(j) return_data{i}(j)];
+       for i=1:size(merged_value, 1) % For each feature vector
+           % Get the start and end date
+           tmp_start_date = merged_descriptions(i, 2);
+           tmp_end_date   = merged_descriptions(i, 3);
+           % This is the slice of stock relevant for this FV
+           [tmp_date_slice, tmp_stock_slice] = fs.slice_by_date(tmp_start_date, tmp_end_date, log_stock_price);
+           % Make sure this is not empty
+           if size(tmp_stock_slice, 1) > 0
+               for j=1:size(tmp_stock_slice, 1)
+                   % Find the Price of the closest date in market index data
+                   tmp_index_price = market_data.AdjClose(fs.find_closest_date(tmp_date_slice(j), market_data.Date));
+                   tmp = [tmp; merged_value(i, :) tmp_stock_slice(j) tmp_index_price];
                    tmpD = [tmpD; merged_descriptions(i, :)];
                end
-           else
-               % These NaN's exist if there isn't any data... at all for
-               % prices for this stock. IE we can't calc returns.
-               tmp = [tmp; merged_value(i, :) NaN NaN]; 
-               tmpD = [tmpD; merged_descriptions(i, :)];
+           else % If there's no stock data in this range, don't keep the feature vector...
+              continue; 
            end
        end
        merged_value = tmp;

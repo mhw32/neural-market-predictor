@@ -8,7 +8,7 @@ function [ start_date, end_date ] = wu_get_quarter_dates( sdate )
     Qdate=sdate(2);
     Qyear=sdate((end-3):end);
 
-    if Qdate=='4'
+    if Qdate=='4'|| Qdate=='Q' % Weirdass typo that the data makes...
         start_date = strcat(Qyear, '-01-01'); 
         end_date = strcat(Qyear, '-03-31'); 
     elseif Qdate=='1'

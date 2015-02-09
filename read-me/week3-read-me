@@ -8,9 +8,15 @@ Goals:
 5) Get code down for normality test and t-test
 6) Label. 
 
+Important Updates: 
+
+Fixed a lot of bugs trying to scale up to 40 week data, instead of 5 data. Split up the log data into log stock returns and log index returns. For cases where log index doesn't have data for the specific stock date, I find the CLOSEST date available. (Sort of hack-y but whatever). I want this so I can do a 2-sample t-test which is easier to handle in the non-parametric case.
+
+We are now ignoring all stocks with 0 price data. And ignoring feature vectors (quarterly data) that have dates in which there exist no stock data. 
+
 New Files:
 
-1) storage folder: holds all the data files (.mat and .pkl). I think I'm just going to keep all the data in .mat because once moved to python, it is loaded extremely fast. If speed really becomes an issue, I will move to CSV.
+1) storage folder (Not uploaded): holds all the data files (.mat and .pkl). I think I'm just going to keep all the data in .mat because once moved to python, it is loaded extremely fast. If speed really becomes an issue, I will move to CSV.
 
 2) create_features.m, calculate_specs.m, relative_returns.m: reworkings of these three files to format data into feature matrix form instead of the previous hash format. 
 
@@ -28,8 +34,13 @@ To run an ipython notebook, simply type "ipython notebook", and a web server wil
 
 	d) detect-cusum.py: CUSUM algorithm found online -- contains some adaptations added by me.
 
+	e) t-test.ipynb: The development of t-test algorithm for both non-parametric, parametric, one-sample, and two-sample distributions. We will be using the two-sample case in which non-parametric = mann-whitney test, and parametric = two sample t test.
+
 	e) Rest of python files: polished versions of the notebooks.
 
+5) stock_log_return.m, index_log_return.m: Files to grab the log return data for each of the two types. 
+
+6) hist_S500_daily_stock_data.m: File to grab DAILY index prices so I can get a better CLOSEST estimate for any dates in which there is no data. 
 
 
 

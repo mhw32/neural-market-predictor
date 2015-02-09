@@ -47,7 +47,9 @@ function funcs = calculate_specs
     % funcs.get_revenue_yoy_trend                = @get_revenue_yoy_trend;
     % Get stock price features
     funcs.get_stock_adj_close_price            = @get_stock_adj_close_price;
-    funcs.get_log_revenue_return               = @get_log_revenue_return;
+    % funcs.get_log_revenue_return               = @get_log_revenue_return;
+    funcs.slice_by_date                        = @slice_by_date;
+    funcs.find_closest_date                    = @find_closest_date;
     funcs.get_date                             = @get_date;
     funcs.do_size_check                        = @do_size_check;
 end
@@ -315,6 +317,8 @@ end
 %}
 
 % Get stock price features
+% DEPRECATED ---------------------------------------
+%{ 
 function val=get_stock_adj_close_price(s, dates)
     begun = false;
     unitlength = size(dates, 1);
@@ -341,7 +345,31 @@ function val=get_stock_adj_close_price(s, dates)
         val = filterP;
     end
 end
+%}
 
+function val = find_closest_date(find_time, array_time)
+    % array_time in our case = all of the daily S&P500 data;
+    % find_time = the particular time we want to find. 
+    [~,idx] = min(abs(datetime(array_time)-datetime(find_time)));
+    val = idx; % This is the right idx -- we need the price here.
+end
+
+% Given all of the stock data, this allows you to pick out a piece of it
+function [d, p]=slice_by_date(start_date, end_date, returns)
+    full_stock_dates = datetime(returns.Date);
+    full_stock_prices = returns.LogReturn;
+    start_date = datetime(start_date);
+    end_date   = datetime(end_date);
+    
+    selection = full_stock_dates > start_date;
+    date_slice = full_stock_dates(selection);
+    price_slice = full_stock_prices(selection);
+    p = price_slice(date_slice < end_date);
+    d  = date_slice(date_slice < end_date);
+end
+
+% DEPRECATED ---------------------------------------
+%{
 function val=get_log_revenue_return(m, s, dates)
     unitlength = size(dates, 1);
     dates = get_date(dates);
@@ -374,6 +402,7 @@ function val=get_log_revenue_return(m, s, dates)
         end
     end
 end
+%}
 
 function val=get_date(dates)
     fake_dates = dates;
@@ -397,6 +426,7 @@ function val=emptyMatrix(number)
     end
 end
 
+%{ 
 function [p, r]=do_size_check(p, r)
     for i=1:size(p, 1)
         if size(p{i}, 1) > 0 && size(p{i}, 1) == size(r{i}, 1) + 1
@@ -405,4 +435,4 @@ function [p, r]=do_size_check(p, r)
         end
     end
 end
-
+%} 
