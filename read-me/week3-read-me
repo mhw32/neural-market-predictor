@@ -42,6 +42,8 @@ To run an ipython notebook, simply type "ipython notebook", and a web server wil
 
 6) hist_S500_daily_stock_data.m: File to grab DAILY index prices so I can get a better CLOSEST estimate for any dates in which there is no data. 
 
+7) label_data.py: File that puts everything together. Pass it your data in matrix form and it will spit out a label. [TO BE REFINED]
+
 
 
 

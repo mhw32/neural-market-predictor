@@ -2,8 +2,6 @@
 # from MATLAB before any true labelling / classification is 
 # performed.
 
-# Please see ipython notebook for visual context.
-
 from scipy.io import loadmat
 import numpy as np
 

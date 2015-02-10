@@ -145,8 +145,14 @@ function [full_indexes, full_features, descriptive_indexes, descriptive_features
            % Make sure this is not empty
            if size(tmp_stock_slice, 1) > 0
                for j=1:size(tmp_stock_slice, 1)
-                   % Find the Price of the closest date in market index data
-                   tmp_index_price = market_data.AdjClose(fs.find_closest_date(tmp_date_slice(j), market_data.Date));
+                   % Find the Price of the closest date in market index
+                   % data if you can't the exact one
+                   find_idx = find(strcmp(log_index_price.Date, tmp_date_slice(j)));
+                   if isempty(find_idx)
+                       % Lets hope this case is small
+                       find_idx = fs.find_closest_date(tmp_date_slice(j), log_index_price.Date);
+                   end
+                   tmp_index_price = log_index_price.LogReturn(find_idx);
                    tmp = [tmp; merged_value(i, :) tmp_stock_slice(j) tmp_index_price];
                    tmpD = [tmpD; merged_descriptions(i, :)];
                end

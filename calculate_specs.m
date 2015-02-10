@@ -50,6 +50,7 @@ function funcs = calculate_specs
     % funcs.get_log_revenue_return               = @get_log_revenue_return;
     funcs.slice_by_date                        = @slice_by_date;
     funcs.find_closest_date                    = @find_closest_date;
+    funcs.group_find_closest_data              = @group_find_closest_data;
     funcs.get_date                             = @get_date;
     funcs.do_size_check                        = @do_size_check;
 end
@@ -354,8 +355,14 @@ function val = find_closest_date(find_time, array_time)
     val = idx; % This is the right idx -- we need the price here.
 end
 
+function val = group_find_closest_data(find_times, array_time)
+    [~, idx] = min(abs(bsxfun(@minus, datenum(array_time), datenum(find_times)')));
+    val = idx;
+end
+
 % Given all of the stock data, this allows you to pick out a piece of it
-function [d, p]=slice_by_date(start_date, end_date, returns)
+function [s, p]=slice_by_date(start_date, end_date, returns)
+    full_string_dates = returns.Date;
     full_stock_dates = datetime(returns.Date);
     full_stock_prices = returns.LogReturn;
     start_date = datetime(start_date);
@@ -363,9 +370,11 @@ function [d, p]=slice_by_date(start_date, end_date, returns)
     
     selection = full_stock_dates > start_date;
     date_slice = full_stock_dates(selection);
+    str_slice = full_string_dates(selection);
     price_slice = full_stock_prices(selection);
     p = price_slice(date_slice < end_date);
-    d  = date_slice(date_slice < end_date);
+    d = date_slice(date_slice < end_date);
+    s = str_slice(date_slice < end_date);
 end
 
 % DEPRECATED ---------------------------------------
