@@ -410,7 +410,7 @@ def anti_inf_vector(vector):
     vector[where_are_infs] = 0
     return vector
 
-def feature_selection(vectors_labels, index, style='tree', preferred):
+def feature_selection(vectors_labels, index, style='recursive', preferred):
     if style not in ['tree', 'chi2', 'recursive']:
         return 'Error: style of feature selection not recognized.'
     # Splitting the vector_labels into actual vectors and labels
