@@ -1,0 +1,13 @@
+Notes from 2.10.15
+
+IDEAS FOR REMOVING NAN
+----------------------
+removing columns with NaN
+removing rows with NaN
+delete those with higher than 10%/99%
+then after that, we can delete 2%/1%
+
+THINK ABOUT LABELLING
+---------------------
+Think about geometric / arithmetic means
+Think about the number of labels
