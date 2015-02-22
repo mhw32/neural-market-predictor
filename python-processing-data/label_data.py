@@ -367,6 +367,19 @@ def wrapper_label_full_stock(data, index, tix, style='standard'):
             
     return labels
 
+def cherry_pick_all_labelled_vector(tickers, vectors_labels):
+    complete = []
+    count = 0
+    for tix,vec in zip(tickers, vectors_labels):
+        if vec != None:
+            # Get all the data
+            part = search_by_ticker(data, tix)
+            # Map the data into feature-vector:label form
+            tmp = [tuple((part[i][3:].astype('float32'), j)) for i,j in vec]
+            complete = complete + tmp
+            count = count+1
+    return np.array(complete)
+
 # ----------------------------------------------------------------
 # FEATURE SELECTION MODELS
 
@@ -488,15 +501,152 @@ def feature_selection(vectors_labels, index, preferred, style='recursive'):
 
 # ----------------------------------------------------------------
 # VISUALIZATION FOR NORMALITY / FEATURES  / ERROR
+import statsmodels.api as sm
+from scipy.stats import pearsonr, kendalltau, spearmanr
+from sklearn.decomposition import PCA as sklearnPCA
+from sklearn.lda import LDA
 
 def probplot(data):
     stats.probplot(data, dist="norm", plot=pylab)
     pylab.show()
 
-import statsmodels.api as sm
 def qqplot(data):
     sm.qqplot(data)
     pylab.show()
 
+# Pearson requires two normally distributed datasets
+# Kendall doesn't require too much
+# Nonparametric form
 
+# Instead of worrying about what's what. I'm just going to try all of these three
+def get_feature_correlation(feature1, feature2, style="pearson", tails="one"):
+    if style not in ["pearson", "kendall", "spearman"]:
+        return 'Error: The style provided is not allowed.'
+    if tails not in ["one", "two"]:
+        return 'Error: The tail provided is not allowed.'
+    if style == "pearson":
+        stat, prob = pearsonr(feature1, feature2)
+    elif style == "kendall":
+        stat, prob = kendalltau(feature1, feature2)
+    else:
+        stat, prob = spearmanr(feature1, feature2)
+    
+    if tails == "two":
+        return stat, prob
+    else:
+        return stat, prob/2
 
+# PCA = generate component axes that maximize the variance
+# LDA = Maximizing the component axes for class separation
+# sklearn_pca = sklearnPCA(n_components=2)
+# X_pca = sklearn_pca.fit_transform(X)
+def plot_pca():
+    ax = plt.subplot(111)
+    for label,marker,color in zip(
+        range(1,4),('^', 's', 'o'),('blue', 'red', 'green')):
+
+        plt.scatter(x=X_pca[:,0][y == label],
+                y=X_pca[:,1][y == label],
+                marker=marker,
+                color=color,
+                alpha=0.5,
+                label=label_dict[label])
+
+    plt.xlabel('PC1')
+    plt.ylabel('PC2')
+
+    leg = plt.legend(loc='upper right', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    plt.title('PCA: Iris projection onto the first 2 principal components')
+
+    # hide axis ticks
+    plt.tick_params(axis="both", which="both", bottom="off", top="off",  
+            labelbottom="on", left="off", right="off", labelleft="on")
+
+    # remove axis spines
+    ax.spines["top"].set_visible(False)  
+    ax.spines["right"].set_visible(False) 
+    ax.spines["bottom"].set_visible(False) 
+    ax.spines["left"].set_visible(False)
+
+    plt.tight_layout
+    plt.grid()
+    plt.show()
+
+# DEPRECATED ... NOT IN USE CURRENTLY
+def plot_step_lda():
+    ax = plt.subplot(111)
+    for label,marker,color in zip(
+        range(1,4),('^', 's', 'o'),('blue', 'red', 'green')):
+
+        plt.scatter(x=X_lda[:,0][y == label],
+                y=X_lda[:,1][y == label],
+                marker=marker,
+                color=color,
+                alpha=0.5,
+                label=label_dict[label]
+                )
+
+    plt.xlabel('LD1')
+    plt.ylabel('LD2')
+
+    leg = plt.legend(loc='upper right', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    plt.title('LDA: Iris projection onto the first 2 linear discriminants')
+
+    # hide axis ticks
+    plt.tick_params(axis="both", which="both", bottom="off", top="off",  
+            labelbottom="on", left="off", right="off", labelleft="on")
+
+    # remove axis spines
+    ax.spines["top"].set_visible(False)  
+    ax.spines["right"].set_visible(False) 
+    ax.spines["bottom"].set_visible(False) 
+    ax.spines["left"].set_visible(False)
+
+    plt.grid()
+    plt.tight_layout
+    plt.show()
+
+def plot_scikit_lda(X, title, mirror=1):
+
+    ax = plt.subplot(111)
+    for label,marker,color in zip(
+        range(1,4),('^', 's', 'o'),('blue', 'red', 'green')):
+
+        plt.scatter(x=X[:,0][y == label]*mirror,
+                y=X[:,1][y == label],
+                marker=marker,
+                color=color,
+                alpha=0.5,
+                label=label_dict[label]
+                )
+
+    plt.xlabel('LD1')
+    plt.ylabel('LD2')
+
+    leg = plt.legend(loc='upper right', fancybox=True)
+    leg.get_frame().set_alpha(0.5)
+    plt.title(title)
+
+    # hide axis ticks
+    plt.tick_params(axis="both", which="both", bottom="off", top="off",  
+            labelbottom="on", left="off", right="off", labelleft="on")
+
+    # remove axis spines
+    ax.spines["top"].set_visible(False)  
+    ax.spines["right"].set_visible(False) 
+    ax.spines["bottom"].set_visible(False) 
+    ax.spines["left"].set_visible(False)
+
+    plt.grid()
+    plt.tight_layout
+    plt.show()
+
+def combine_lda_pca(X, y):
+    sklearn_lda = LDA(n_components=2)
+    X_lda_sklearn = sklearn_lda.fit_transform(X, y)
+    sklearn_pca = sklearnPCA(n_components=2) #PCA
+    X_ldapca_sklearn = sklearn_pca.fit_transform(X_lda_sklearn)
+    plot_scikit_lda(X_ldapca_sklearn, title='LDA+PCA via scikit-learn', mirror=(-1))
+    
