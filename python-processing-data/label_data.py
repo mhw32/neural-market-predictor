@@ -18,6 +18,10 @@ import scipy.stats as stats
 from pylab import *
 from scipy.stats import ttest_1samp, mannwhitneyu
 
+# Define Global Errors
+ERROR_MAGNITUDE = 1111
+ERROR_EXISTENCE = 2222
+
 # ----------------------------------------------------------------
 # MAIN PROGRAM -- TO DO THE CODE
 
@@ -170,7 +174,7 @@ def search_best_params(stock_data, disp=0.20, plotting=False):
             # Let's try to pick out the ones with definitely more than 10
             seg = np.array(seg)
             # Make sure that there are no super small differenes, and none of them are 0
-            if len(seg) <= 40 or len(seg) >= 50:
+            if len(seg) >= 70:
                 continue
             # print('threshold: %f & drift: %f' % (i, j))
             combos.append((i, j, ta, seg))
@@ -180,8 +184,13 @@ def search_best_params(stock_data, disp=0.20, plotting=False):
         chosen_threshold, chosen_drift, chosen_cuts, _ = combos[::-1][0]
         chosen_cuts = cusum_consolidate(combos[::-1][0])
     else:
-        print('Unable to find anything: Moving to displacement ' + str(disp+0.05))
-        chosen_threshold, chosen_drift, chosen_cuts = search_best_params(stock_data, disp+0.05, False)
+        if disp < 5:
+            print('Unable to find anything: Moving to displacement ' + str(disp+0.05))
+            chosen_threshold, chosen_drift, chosen_cuts = search_best_params(stock_data, disp+0.05, False)
+        else:
+            print('Returning entire segment. Completely unable to find anything.')
+            chosen_threshold, chosen_drift, chosen_cuts = None, None, ERROR_EXISTENCE
+
     return chosen_threshold, chosen_drift, chosen_cuts
 
 # The goal now is to select 50, and only pick the ones out of there that are > 20 
@@ -205,11 +214,14 @@ def split_by_cusum(data, index, ticker, plotting=False):
     tix = search_by_ticker(data, ticker)
     stock_tix = search_by_index(index, tix, 'Log Stock Return').astype('float32')
     market_tix = search_by_index(index, tix, 'Log Index Return').astype('float32')
+
+    if len(stock_tix) < 100:
+        return None, None, ERROR_MAGNITUDE
     # Apply the CUSUM
     #print ('Finding Optimal Parameter...')
     threshold, drift, ta = search_best_params(stock_tix)
     if type(ta) == int:
-        return 0
+        return None, None, ERROR_EXISTENCE
     #print('Set threshold: %f & drift: %f...' % (threshold, drift))
     #print('Found %d divisions...' % len(ta))
     # Append and Prepend the right values
@@ -325,7 +337,19 @@ def wrapper_label_full_stock(data, index, tix, style='standard'):
     stock_tix = search_by_index(index, part, 'Log Stock Return').astype('float32')
     market_tix = search_by_index(index, part, 'Log Index Return').astype('float32')
     labels = []
-    
+
+    if len(stock_tix) < 100 or (type(cracks) == int and cracks == ERROR_MAGNITUDE):
+        print("Error: not enough data for ticker %s." % str(tix))
+        return None
+    elif type(cracks) == int and cracks == ERROR_EXISTENCE:
+        # Something broke... 
+        print('Treating entire time data as segment for stock %s.' % str(tix))
+        # Run this on the entire set
+        tmp = tuple((0, int(one_tailed_two_sample_t_test(stock_tix, \
+                    market_tix, alpha=0.05))))
+        labels.append(tmp)
+        return labels 
+
     for i in range(len(cracks)-1):
         start = cracks[i]
         end   = cracks[i+1]
@@ -353,6 +377,10 @@ from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import RFE
 
+from sklearn.cross_validation import StratifiedKFold
+from sklearn.feature_selection import RFECV
+from sklearn.datasets import make_classification
+
 # Recursively removes attributes and builds a model with those 
 # attributes that remain. Uses accuracy to identify which 
 # attributes work to predicting the target attribute.
@@ -379,6 +407,30 @@ def chi2_selection(vectors, labels, num):
         return 'Error: features selected must be less than total number of features'
     X_new = SelectKBest(chi2, k=num).fit_transform(vectors, labels)
     return X_new
+
+# FEATURE NUMBER SELECTION 
+
+# Uses the RFE to do cross validation to pick the optimal # of features
+def rfe_cross_validate(X, y):
+    # Create the RFE object and compute a cross-validated score.
+    model = LogisticRegression() 
+    # The "accuracy" scoring is proportional to the number of correct
+    # classifications
+    rfecv = RFECV(estimator=model, step=1, cv=StratifiedKFold(y, 2), 
+                  scoring='accuracy')
+    rfecv.fit(X, y)
+    # plot it 
+    plt.figure()
+    plt.xlabel("Number of features selected")
+    plt.ylabel("Cross validation score (nb of correct classifications)")
+    plt.plot(range(1, len(rfecv.grid_scores_) + 1), rfecv.grid_scores_)
+    plt.show()
+
+# We can attempt a cross val method with extra trees as well.
+# Let's be conservative: get the number we should use for RFE:x, return x + 5 features.
+def extra_trees_cross_validate(X, y, pad):
+    RFE_num = rfe_cross_validate(X, y)
+    return RFE_num + int(pad)
 
 # ----------------------------------------------------------------
 # FULL STEPS FROM REMOVING NAN --> FEATURE SELECTION
@@ -410,7 +462,7 @@ def anti_inf_vector(vector):
     vector[where_are_infs] = 0
     return vector
 
-def feature_selection(vectors_labels, index, style='recursive', preferred):
+def feature_selection(vectors_labels, index, preferred, style='recursive'):
     if style not in ['tree', 'chi2', 'recursive']:
         return 'Error: style of feature selection not recognized.'
     # Splitting the vector_labels into actual vectors and labels
@@ -434,6 +486,17 @@ def feature_selection(vectors_labels, index, style='recursive', preferred):
         return fitting
 
 
+# ----------------------------------------------------------------
+# VISUALIZATION FOR NORMALITY / FEATURES  / ERROR
+
+def probplot(data):
+    stats.probplot(data, dist="norm", plot=pylab)
+    pylab.show()
+
+import statsmodels.api as sm
+def qqplot(data):
+    sm.qqplot(data)
+    pylab.show()
 
 
 
