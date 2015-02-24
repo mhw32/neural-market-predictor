@@ -206,6 +206,25 @@ def cusum_consolidate(complete):
     joined = np.array(joined)
     return joined
 
+# This is intended to be a function to categorize the data into 3 labels
+# Small, Medium, Large intervals!!! (For more comparability)
+CUSUM_LABEL_CUTOFF = 45
+def cusum_threshold(complete):
+    small  = [] # < 45
+    large  = [] # > 40
+    
+    indices, shifts = complete[2], complete[3]
+    base = indices[0]
+    for i in range(len(indices)-1):
+        step = indices[i] - base
+        if  step < CUSUM_LABEL_CUTOFF:
+            small.append(indices[i])
+        else:
+            large.append(indices[i])
+    small = np.array(small)
+    large = np.array(large)
+    return small, large
+
 # Do the physical splitting once you have the right parameters
 def split_by_cusum(data, index, ticker, plotting=False):
     #print('Starting CUSUM Evaluation')
@@ -243,6 +262,15 @@ def split_by_cusum(data, index, ticker, plotting=False):
 
 # ----------------------------------------------------------------
 # T-TESTS TO RUN THESE
+
+def get_min_sample_size(market_data, start, end):
+    # index_return = index_price_end/index_price_start (of investment horizon)
+    market_return = market_data[end] / float(market_data[start])
+    sigma = np.std(market_data[start:end])
+    # sigma = sqrt(variance) = standard deviation
+    tau = log((0.05 / 52 + market_return) / market_return) 
+    n = (2.48 * sigma / float(tau))**2
+    return n
 
 # This works because the t_stat is SIGNED. Thus if it is > 0, 
 # then we can reject in favor of a greater than alternative. 
@@ -445,6 +473,17 @@ def extra_trees_cross_validate(X, y, pad):
     RFE_num = rfe_cross_validate(X, y)
     return RFE_num + int(pad)
 
+# Given some list of chosen features, actually pick them out
+def prune_vectors_given_features(feature_vectors, chosen_features, index):
+    found = [np.where(index == i)[0][0] for i in chosen_features]
+    found = [i-3 for i in found] # Because I look out the dates + quarter
+    # Pick out from vectors
+    pruned = []
+    for vec in feature_vectors:
+        pruned.append(np.array([vec[i] for i in found]))
+    pruned = np.array(pruned)
+    return pruned
+
 # ----------------------------------------------------------------
 # FULL STEPS FROM REMOVING NAN --> FEATURE SELECTION
 
@@ -501,6 +540,7 @@ def feature_selection(vectors_labels, index, preferred, style='recursive'):
 
 # ----------------------------------------------------------------
 # VISUALIZATION FOR NORMALITY / FEATURES  / ERROR
+
 import statsmodels.api as sm
 from scipy.stats import pearsonr, kendalltau, spearmanr
 from sklearn.decomposition import PCA as sklearnPCA
@@ -649,4 +689,17 @@ def combine_lda_pca(X, y):
     sklearn_pca = sklearnPCA(n_components=2) #PCA
     X_ldapca_sklearn = sklearn_pca.fit_transform(X_lda_sklearn)
     plot_scikit_lda(X_ldapca_sklearn, title='LDA+PCA via scikit-learn', mirror=(-1))
-    
+
+# ----------------------------------------------------------------
+# Self organizing map code 
+
+def SOM_clustering(pruned, xsize, ysize, plotting=True):
+    msz0 = xsize
+    msz1 = ysize
+    # Hack to get rid of these
+    pruned[isnan(pruned)] = 0
+    pruned[isinf(pruned)] = 0
+    sm = SOMPY.SOM('sm', pruned, mapsize=[msz0, msz1], norm_method = 'var')
+    sm.train(n_job = 1, shared_memory = 'no')
+    if plotting == True:
+        sm.view_map(which_dim = 'all')
