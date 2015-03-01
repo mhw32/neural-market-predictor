@@ -2,17 +2,21 @@ READ-ME FOR WEEK FOUR
 
 Important Updates
 
-1) Dealt with NaN's. I didn't think it was a good idea to remove rows given our limited data. Instead I removed all feature colums with more than 1% of NaN's / Infs. This left me with 81 / 122 features. I checked that the ones removes are not ridiculously important, but even if they were, there's not much we can do (they have about 70% NaN's..)
+1) Dealt with NaN's. I didn't think it was a good idea to remove rows given our limited data. Instead I removed all feature colums with more than 1% of NaN's / Infs. This left me with 81 / 122 features. I checked that the ones removed are not ridiculously important, but even if they were, there's not much we can do (they have about 70% NaN's..)
 
-2) Wrote some code to iteratively go through CUSUM to pick best parameters. The judging heuristic I have is that there should be somewhere between 40-50 groups. Then some of the groups have < 20 (or TBD size based on Cohen's D) -- so we consolidate these groups with previous ones. 
+2) Wrote some code to iteratively go through CUSUM to pick best parameters. The judging heuristic I have is that there should be somewhere between 40-50 groups. Then some of the groups have < 20 (or TBD size based on Cohen's D) -- so we consolidate these groups with previous ones. End up with around 10-15 groups. We can make these smaller or wtv if needed.
 
 3) Fixed up the t tests and normality to be up to speed and compatible.
 
-4) Labelling all the data -- The functions aren't really optimizes that much so it takes a little bit to run them! (should have all labelled data by tutorial). Because it takes a little bit, I just ran it on 350 / 2500 for development. Will run on all in near future.
+4) Labelling all the data -- The functions aren't really optimized that much so it takes a little bit to run them! (should have all labelled data by tutorial). Because it takes a little bit, I just ran it on 350 / 2500 for development. Will run on all in near future.
 
-5) Feature selection. Wrote three things (Recursive Feature Selection, Chi2, and Tree Classifier). I'm looking to have 20-30 features at the end of the day.
+5) Feature selection. Wrote three things (Recursive Feature Selection, Chi2, and Tree Classifier). I'm looking to have 20-30 features at the end of the day. Removed chi2 from consideration -- ranked features with Tree and picked top 25 with RFE.
 
-6) I adapted CUSUM to be able to implement itself on t0 -- tn, t1 -- tn, t2 -- tn as along as sample size is big enough (like we talked about). This is an option, but for now, I'm going to see if I have enough data points without this...It's also interesting to think about HOW I'm labeling this. For now, I'm disregarding the time length of the segments... if thing's don't work out, I will think about implementing some version that does discriminate.
+Ran PCA for fun. (no labelling)
+
+Extra Trees Classifier: fits a number of randomized decision trees (a.k.a. extra-trees) on various sub-samples of the dataset and use averaging to improve the predictive accuracy and control over-fitting.
+
+6) I adapted CUSUM to be able to implement itself on t0 -- tn, t1 -- tn, t2 -- tn as long as sample size is big enough (like we talked about). This is an option, but for now, I'm going to see if I have enough data points without this...It's also interesting to think about HOW I'm labeling this. For now, I'm disregarding the time length of the segments... if thing's don't work out, I will think about implementing some version that does discriminate. I'm not considering this because the time intervals are so all over the spectrum.
 
 7) Did some visualization for normality. Hopefully I want to do some QQ plot / feature histogram stuff before tutor meeting. 
 

@@ -242,18 +242,6 @@ def split_by_cusum(data, index, ticker, plotting=False):
     if type(ta) == int:
         return None, None, ERROR_EXISTENCE
     #print('Set threshold: %f & drift: %f...' % (threshold, drift))
-    #print('Found %d divisions...' % len(ta))
-    # Append and Prepend the right values
-    ta = list(ta)
-    if (ta[-1] != len(stock_tix)):
-        if (len(stock_tix) - ta[-1] > 20):
-            ta.append(len(stock_tix))
-        else:
-            ta[len(ta)-1] = len(stock_tix)
-    if ta[0] > 20:
-        ta = [0] + ta
-    else:
-        ta[0] = 0
     # Do the splitting
     split_by_cusum = np.array([stock_tix[i:j] for i,j in zip(ta[0:len(ta)-1], ta[1:])])
     split_by_market = np.array([market_tix[i:j] for i,j in zip(ta[0:len(ta)-1], ta[1:])])
@@ -395,7 +383,7 @@ def wrapper_label_full_stock(data, index, tix, style='standard'):
             
     return labels
 
-def cherry_pick_all_labelled_vector(tickers, vectors_labels):
+def cherry_pick_all_labelled_vector(tickers, vectors_labels, data):
     complete = []
     count = 0
     for tix,vec in zip(tickers, vectors_labels):
