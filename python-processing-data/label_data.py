@@ -691,3 +691,8 @@ def SOM_clustering(pruned, xsize, ysize, plotting=True):
     sm.train(n_job = 1, shared_memory = 'no')
     if plotting == True:
         sm.view_map(which_dim = 'all')
+
+# Splitting for Testing and Training
+def split_test_train(vector, label, size=0.3, random_seed=42):
+    v_train, v_test, l_train, l_test = train_test_split(vector, label, test_size=0.3, random_state=42)
+    return v_train, v_test, l_train, l_test
