@@ -135,7 +135,7 @@ function h=som_show_add(mode,D,varargin)
 %
 %  Mode       Valid D
 %  'label'    map struct or Mxl cell array of strings, where
-%              M is number of map units and l maximum numer of
+%              M is number of map units and l maximum number of
 %              labels in unit.
 %
 %  'hit'      Mx1 vector or MxK matrix, where M is number of map

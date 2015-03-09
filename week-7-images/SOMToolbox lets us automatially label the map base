@@ -1,0 +1,13 @@
+SOMToolbox lets us automatially label the map based on the labelled data we give it. The BMU of each vector in the data is found in the Map. Lots of instances of good investment, lots of instance of bad investment. It would be interesting to see the raw comparison of these to be able to rank top 10. 
+ 
+Given that a lot of vectors from our data map to the same SOM unit, there's a lot of labels there. So we can look at the fraction of them that are good investments and rank them this way. 
+
+Also it might be interested to do a convolution filter on this matrix of labels. With the right filter, this might be interested because it strengthens the places were not only do you have a majority of votes for a good investment but also your neighbors are also good investments = more confidence. 
+
+x =
+
+     0     0     0     0     0
+     0     1     1     1     0
+     0     1     2     1     0
+     0     1     1     1     0
+     0     0     0     0     0

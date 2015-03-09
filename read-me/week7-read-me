@@ -1,0 +1,33 @@
+WEEK 7 UPDATES 
+==============
+
+SOM is very dependent on the feature selection and labelling method. These are the several combinations now available for SOM.
+
+Feature Selection: Recursive Feature Extraction, Extra Trees Classifier, Principle Component Analysis. 
+
+(It's interesting to note here that I'm taking the top 20 features from Trees, top 25 from RFE, and about 5 from PCA * It's important to note here that 5 features explain 99.995% of the variance. For PCA, even 2 components explain 98%). An F-test was conducted but unsuccessful in general (No explicit "elbow").
+
+Labelling CUSUM Size: Small, Middle, Large. Instead of setting explicit cut-offs for the CUSUM, now each CUSUM instance is given a "target" value. The CUSUM divisions are preserved while the segments try to maintain a size agreeable with the target one. Small = 25 weeks, Middle = 52 weeks (1 year), Large = 156 Weeks (3 years).
+
+This week's work mainly circled around the SOM. Given the poor libraries in Python, I moved my data back into Matlab. This way I could make use of the SomToolBox which is by far the most extensive SOM library existing.
+
+This library allows to me to calculate the UMatrix. However, Jason and I spent some time together accomplishing the following things:
+1) Hacked together the Component Planes project of the labels. 
+2) Given the sM.labels field of the SOM Map Object, instead of training and autolabelling these to be pure 1 or 0, use the "additive" method to accumulate all the individual votes for a particular SOM unit. 
+
+The workflow will now be the following: 
+Given the training data and training labels:  Traing the SOM on a 100 by 100 SOM map with all of the data, and for each testing vector, find it's BMU. Map that unit index to the labels and return 1 or 0. 
+
+Given the images Irina sent us, I noticed that the clusters produced generalize the structure in the CP. Therefore I thought it wise to convolve the matrix of votes such that we emphasize the value of clusters of good investments. Also using the "additive" method instead of pure 1 and 0 allows us to see which SOM units are CLEARLY good investments and which are not. In the SOMMAT folder, I have placed several files beginning with mike-*.mat s.t. these files contain all the functions needed to visualize CP/UMat effectively and test new vectors with the SOM. 
+
+In the home directory of the dropbox folder is a pdf: SOMResultsWeek7. This shows different combinations of CUSUM labelling and Feature selection and the parallel CP/Umat Plots. From it, I personally want to conclude:
+
+1) Definitely train with large amounts of data = more visual knowledge
+2) There are no CLEAR clusters of good investments
+3) PCA may not be a good idea: It clumps the good and bad investments in an indistinguishable blob.
+4) If I had to choose one to use, I would use the Extra Trees Classfier with Medium CUSUM Labelling OR the Recursive Feature Extraction w/ Medium CUSUM Labelling. 
+
+Goals for next week:
+Scrape the testing data. I have written a function to divide my data into testing and training but I think it may be more relevant to grab the past 2 years of data. Then For each vector, use my functions to get the BMU, maps it to the convolved label space. Then check where in the label space exist the "confident" clusters, i.e those with lots of votes. Pick the top 10 projections that are the closest to these "confident" clusters. 
+
+

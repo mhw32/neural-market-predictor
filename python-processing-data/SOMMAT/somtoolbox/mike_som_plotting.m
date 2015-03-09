@@ -16,6 +16,6 @@ sMap = som_make(sData, 'msize', [100 100]);
 % Use the labels on the map
 disp('Automatically label the SOM through voting');
 sMap = som_autolabel(sMap,sData,'vote');
-som_show(sMap,'umat','all', 'empty', 'labels', 'norm', 'd');
+som_show(sM,'umat','all', 'empty', 'labels', 'norm', 'd');
 disp('Plot the U-Matrix and the Component Labels');
-som_show_add('label',sMap.labels,'textsize',8,'textcolor','r','subplot',2);
+som_show_add('label',sM.labels,'textsize',8,'textcolor','r','subplot',2);
